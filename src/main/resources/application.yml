@@ -1,6 +1,16 @@
 spring:
+  profiles:
+    active: local
+
+---
+
+spring:
+  config:
+    activate:
+      on-profile: local
+
   datasource:
-    url: jdbc:mysql://localhost:3306/springbatch
+    url: jdbc:mysql://localhost:3306/springbatch?useUnicode=true&characterEncoding=utf8
     username: root
     password: root
     driver-class-name: com.mysql.cj.jdbc.Driver
