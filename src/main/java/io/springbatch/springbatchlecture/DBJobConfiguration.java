@@ -35,7 +35,7 @@ public class DBJobConfiguration {
                 .tasklet(new Tasklet() {
                     @Override
                     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-                        log.info("DB TEST STEP 111111122");
+                        log.info("DB TEST STEP 111@@@@@@@@111121231232");
                         return RepeatStatus.FINISHED;
                     }
                 })
