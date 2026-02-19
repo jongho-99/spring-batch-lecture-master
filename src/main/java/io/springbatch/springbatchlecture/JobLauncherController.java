@@ -42,7 +42,9 @@ public class JobLauncherController {
                 .addString("id", member.getId())
                 .addDate("date", new Date())
                 .toJobParameters();
-
+        // SimpleJobLauncher 캐스팅이 가능한 JobLauncher를 꺼내서 캐스팅 하고 setTaskExecutor 메서드를 통해서 비동기 선언
+        // 동기 방식은 작업 모두 마치고 응답
+        // 비동기는 바로 응답하면서 동시에 작업진행
         SimpleJobLauncher jobLauncher = (SimpleJobLauncher)basicBatchConfigurer.getJobLauncher();
         jobLauncher.setTaskExecutor(new SimpleAsyncTaskExecutor());
         jobLauncher.run(job, jobParameters);
