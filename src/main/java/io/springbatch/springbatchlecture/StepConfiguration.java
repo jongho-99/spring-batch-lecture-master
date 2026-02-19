@@ -20,44 +20,39 @@ public class StepConfiguration {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
-    private final ExecutionContextConfiguration1 executionContextConfiguration1;
-    private final ExecutionContextConfiguration2 executionContextConfiguration2;
-    private final ExecutionContextConfiguration3 executionContextConfiguration3;
-    private final ExecutionContextConfiguration4 executionContextConfiguration4;
 
 
     @Bean
     public Job job() {
-        return jobBuilderFactory.get("jobTest2")
+        return jobBuilderFactory.get("jobTest")
                 .start(step01())
                 .next(step02())
-                .next(step03())
-                .next(step04())
                 .build();
     }
 
 
     public Step step01() {
         return stepBuilderFactory.get("step01")
-                .tasklet(executionContextConfiguration1)
+                .tasklet(new Tasklet() {
+                    @Override
+                    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+                        System.out.println("step01 called....");
+                        return RepeatStatus.FINISHED;
+                    }
+                })
                 .build();
     }
 
     public Step step02() {
         return stepBuilderFactory.get("step02")
-                .tasklet(executionContextConfiguration2)
+                .tasklet(new Tasklet() {
+                    @Override
+                    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+                        System.out.println("step02 called....");
+                        return RepeatStatus.FINISHED;
+                    }
+                })
                 .build();
     }
 
-    public Step step03() {
-        return stepBuilderFactory.get("step03")
-                .tasklet(executionContextConfiguration3)
-                .build();
-    }
-
-    public Step step04() {
-        return stepBuilderFactory.get("step04")
-                .tasklet(executionContextConfiguration4)
-                .build();
-    }
 }
