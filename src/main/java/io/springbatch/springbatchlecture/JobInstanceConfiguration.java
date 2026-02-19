@@ -2,7 +2,9 @@ package io.springbatch.springbatchlecture;
 
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -13,6 +15,8 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.Map;
+
 @Configuration
 @RequiredArgsConstructor
 public class JobInstanceConfiguration {
@@ -22,35 +26,48 @@ public class JobInstanceConfiguration {
 
     @Bean
     public Job job() {
-        return jobBuilderFactory.get("job")
-                .start(step1())
-                .next(step2())
+        return jobBuilderFactory.get("jobTest")
+                .start(step01())
+                .next(step02())
                 .build();
     }
 
-    @Bean
-    public Step step1() {
-        return stepBuilderFactory.get("step1")
+
+    public Step step01() {
+        return stepBuilderFactory.get("step01")
                 .tasklet(new Tasklet() {
                     @Override
                     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-                        return null;
+
+                        // stepcontibution을 통한 JobParameter 조회(JobParamter 형태)
+                        JobParameters jobParameters = stepContribution.getStepExecution().getJobExecution().getJobParameters();
+                        jobParameters.getString("name");
+                        jobParameters.getLong("seq");
+                        jobParameters.getDate("date");
+                        jobParameters.getDouble("age");
+
+                        // chunkContext를 통한 JobParameter 조회(Map 형태)
+                        Map<String, Object> jobParameters1 = chunkContext.getStepContext().getJobParameters();
+
+                        System.out.println("step01 called ~~~~~!!!!");
+                        System.out.println("======================================");
+                        System.out.println("jobParameters = " + jobParameters);
+                        System.out.println("chunkContext = " + jobParameters1);
+                        return RepeatStatus.FINISHED;
                     }
                 })
                 .build();
     }
 
-    @Bean
-    public Step step2() {
-        return stepBuilderFactory.get("step2")
+    public Step step02() {
+        return stepBuilderFactory.get("step02")
                 .tasklet(new Tasklet() {
                     @Override
                     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-                        return null;
+                        System.out.println("step02 called ~~~~~!!!!");
+                        return RepeatStatus.FINISHED;
                     }
                 })
                 .build();
     }
-
-
 }
