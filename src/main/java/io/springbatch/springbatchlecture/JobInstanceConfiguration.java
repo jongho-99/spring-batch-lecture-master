@@ -26,7 +26,7 @@ public class JobInstanceConfiguration {
 
     @Bean
     public Job job() {
-        return jobBuilderFactory.get("jobTest")
+        return jobBuilderFactory.get("jobTest2")
                 .start(step01())
                 .next(step02())
                 .build();
@@ -42,17 +42,10 @@ public class JobInstanceConfiguration {
                         // stepcontibution을 통한 JobParameter 조회(JobParamter 형태)
                         JobParameters jobParameters = stepContribution.getStepExecution().getJobExecution().getJobParameters();
                         jobParameters.getString("name");
-                        jobParameters.getLong("seq");
-                        jobParameters.getDate("date");
-                        jobParameters.getDouble("age");
 
-                        // chunkContext를 통한 JobParameter 조회(Map 형태)
-                        Map<String, Object> jobParameters1 = chunkContext.getStepContext().getJobParameters();
-
+                        System.out.println("jobParameter = " + jobParameters);
                         System.out.println("step01 called ~~~~~!!!!");
-                        System.out.println("======================================");
-                        System.out.println("jobParameters = " + jobParameters);
-                        System.out.println("chunkContext = " + jobParameters1);
+
                         return RepeatStatus.FINISHED;
                     }
                 })
