@@ -31,9 +31,9 @@ public class StepConfiguration {
     @Bean
     public Job batchJob() {
         return jobBuilderFactory.get("batchJob1")
-                .incrementer(new RunIdIncrementer())
                 .start(step01())
-                .next(chunkStep())
+                .next(step02())
+//                .next(chunkStep())
                 .build();
     }
 
@@ -43,33 +43,47 @@ public class StepConfiguration {
                 .tasklet(new Tasklet() {
                     @Override
                     public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
-                        System.out.println("step01 called....");
+                        System.out.println("[STEP01] stepContribution = " + stepContribution + ", chunkContext = " + chunkContext);
                         return RepeatStatus.FINISHED;
                     }
                 })
+                .allowStartIfComplete(true)
                 .build();
     }
-
     @Bean
-    public Step chunkStep() {
-        return stepBuilderFactory.get("chunkStep")
-                .<String, String>chunk(10)
-                .reader(new ListItemReader<>(Arrays.asList("item1","item2","item3","item4","item5")))
-                .processor(new ItemProcessor<String, String>() {
+    public Step step02() {
+        return stepBuilderFactory.get("step02")
+                .tasklet(new Tasklet() {
                     @Override
-                    public String process(String item) throws Exception {
-                        return item.toUpperCase();
+                    public RepeatStatus execute(StepContribution stepContribution, ChunkContext chunkContext) throws Exception {
+                        System.out.println("[STEP02] stepContribution = " + stepContribution + ", chunkContext = " + chunkContext);
+                        throw new RuntimeException("step02 was failed");
+//                        return null;
                     }
                 })
-                .writer(new ItemWriter<String>() {
-                    @Override
-                    public void write(List<? extends String> items) throws Exception {
-                        items.forEach(item -> System.out.println("items = " + item));
-                    }
-                })
+                .startLimit(4)
                 .build();
     }
 
 
+//    @Bean
+//    public Step chunkStep() {
+//        return stepBuilderFactory.get("chunkStep")
+//                .<String, String>chunk(10)
+//                .reader(new ListItemReader<>(Arrays.asList("item1","item2","item3","item4","item5")))
+//                .processor(new ItemProcessor<String, String>() {
+//                    @Override
+//                    public String process(String item) throws Exception {
+//                        return item.toUpperCase();
+//                    }
+//                })
+//                .writer(new ItemWriter<String>() {
+//                    @Override
+//                    public void write(List<? extends String> items) throws Exception {
+//                        items.forEach(item -> System.out.println("items = " + item));
+//                    }
+//                })
+//                .build();
+//    }
 
 }
