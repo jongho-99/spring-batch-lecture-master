@@ -16,6 +16,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -30,8 +31,8 @@ public class StepConfiguration {
 
     @Bean
     public Job batchJob() {
-        return jobBuilderFactory.get("batchJob1")
-                .incrementer(new RunIdIncrementer())
+        return jobBuilderFactory.get("batchJob12")
+//                .incrementer(new RunIdIncrementer())
                 .start(chunkStep())
 //                .next(step02())
 //                .next(chunkStep())
@@ -67,49 +68,28 @@ public class StepConfiguration {
     }
 
 
-//    @Bean
-//    public Step chunkStep() {
-//        return stepBuilderFactory.get("chunkStep")
-//                .<String, String>chunk(3)
-//                .reader(new ListItemReader<>(Arrays.asList("item1","item2","item3","item4","item5")))
-//                .processor(new ItemProcessor<String, String>() {
-//                    @Override
-//                    public String process(String item) throws Exception {
-//                        return item.toUpperCase();
-//                    }
-//                })
-//                .writer(new ItemWriter<String>() {
-//                    @Override
-//                    public void write(List<? extends String> items) throws Exception {
-//                        items.forEach(item -> System.out.println("items = " + item));
-//                    }
-//                })
-//                .build();
-//    }
-
     @Bean
     public Step chunkStep() {
         return stepBuilderFactory.get("chunkStep")
-                .<Customer, Customer>chunk(3)
+                .<String, String>chunk(5)
                 .reader(itemReader())
-                .processor(itemProcessor())
                 .writer(itemWriter())
                 .build();
     }
 
-    private ItemWriter<? super Customer> itemWriter() {
-        return new CustomItemWriter();
+    private CustomItemStreamReader itemReader() {
+        List<String> items = new ArrayList<>(10);
+
+        for(int i = 0; i<10; i++) {
+            items.add(String.valueOf(i));
+        }
+        return new CustomItemStreamReader(items);
     }
 
-    private ItemProcessor<? super Customer, ? extends Customer> itemProcessor() {
-        return new CustomItemProcessor();
+    private CustomItemStreamWriter itemWriter() {
+        return new CustomItemStreamWriter();
     }
 
-    @Bean
-    public ItemReader<Customer> itemReader() {
-        return new CustomItemReader(Arrays.asList(new Customer("user01"),
-                new Customer("user02"),
-                new Customer("user03")));
-    }
+
 
 }
