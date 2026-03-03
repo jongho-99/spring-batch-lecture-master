@@ -31,8 +31,9 @@ public class StepConfiguration {
     @Bean
     public Job batchJob() {
         return jobBuilderFactory.get("batchJob1")
-                .start(step01())
-                .next(step02())
+                .incrementer(new RunIdIncrementer())
+                .start(chunkStep())
+//                .next(step02())
 //                .next(chunkStep())
                 .build();
     }
@@ -61,7 +62,7 @@ public class StepConfiguration {
 //                        return null;
                     }
                 })
-                .startLimit(4)
+//                .startLimit(4)
                 .build();
     }
 
@@ -69,7 +70,7 @@ public class StepConfiguration {
 //    @Bean
 //    public Step chunkStep() {
 //        return stepBuilderFactory.get("chunkStep")
-//                .<String, String>chunk(10)
+//                .<String, String>chunk(3)
 //                .reader(new ListItemReader<>(Arrays.asList("item1","item2","item3","item4","item5")))
 //                .processor(new ItemProcessor<String, String>() {
 //                    @Override
@@ -85,5 +86,30 @@ public class StepConfiguration {
 //                })
 //                .build();
 //    }
+
+    @Bean
+    public Step chunkStep() {
+        return stepBuilderFactory.get("chunkStep")
+                .<Customer, Customer>chunk(3)
+                .reader(itemReader())
+                .processor(itemProcessor())
+                .writer(itemWriter())
+                .build();
+    }
+
+    private ItemWriter<? super Customer> itemWriter() {
+        return new CustomItemWriter();
+    }
+
+    private ItemProcessor<? super Customer, ? extends Customer> itemProcessor() {
+        return new CustomItemProcessor();
+    }
+
+    @Bean
+    public ItemReader<Customer> itemReader() {
+        return new CustomItemReader(Arrays.asList(new Customer("user01"),
+                new Customer("user02"),
+                new Customer("user03")));
+    }
 
 }
